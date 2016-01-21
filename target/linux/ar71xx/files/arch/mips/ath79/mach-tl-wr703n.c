@@ -64,10 +64,8 @@ static void __init common_setup(unsigned usb_power_gpio, bool sec_ethernet)
 	u8 *mac = (u8 *) KSEG1ADDR(0x1f01fc00);
 	u8 *ee = (u8 *) KSEG1ADDR(0x1fff1000);
 
-	/* disable PHY_SWAP and PHY_ADDR_SWAP bits */
-	ath79_setup_ar933x_phy4_switch(false, false);
+	ath79_setup_ar933x_phy4_switch(true, true);
 
-	ath79_register_m25p80(&tl_wr703n_flash_data);
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(tl_wr703n_leds_gpio),
 				 tl_wr703n_leds_gpio);
 	ath79_register_gpio_keys_polled(-1, TL_WR703N_KEYS_POLL_INTERVAL,
@@ -79,18 +77,17 @@ static void __init common_setup(unsigned usb_power_gpio, bool sec_ethernet)
 			 "USB power");
 	ath79_register_usb();
 
-	ath79_init_mac(ath79_eth0_data.mac_addr, mac, 0);
+
+	ath79_register_m25p80(&tl_wr741ndv4_flash_data);
+	ath79_init_mac(ath79_eth0_data.mac_addr, mac, 1);
+	ath79_init_mac(ath79_eth1_data.mac_addr, mac, -1);
 
 	ath79_register_mdio(0, 0x0);
 	ath79_register_eth(0);
-
-	if (sec_ethernet)
-	{
-		ath79_init_mac(ath79_eth1_data.mac_addr, mac, -1);
-		ath79_register_eth(1);
-	}
+	ath79_register_eth(1);
 
 	ath79_register_wmac(ee, mac);
+
 }
 
 static void __init tl_mr10u_setup(void)
